@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+<header th:fragment="header">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-fish me-2"></i>Помощник рыболова
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarMain">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" th:classappend="${currentUrl != null && currentUrl == '/' ? 'active' : ''}"
+                           href="/">Главная</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:classappend="${currentUrl != null && currentUrl.startsWith('/fish') ? 'active' : ''}"
+                           href="/fish">Каталог рыб</a>
+                    </li>
+                    <li class="nav-item dropdown" th:if="${userId != null}">
+                        <a class="nav-link dropdown-toggle" href="#" id="achievementsDropdown" role="button"
+                           data-bs-toggle="dropdown" aria-expanded="false">
+                            Достижения
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="achievementsDropdown">
+                            <li><a class="dropdown-item" href="/achievements">Мои достижения</a></li>
+                            <li><a class="dropdown-item" href="/achievements/add">Добавить достижение</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:classappend="${currentUrl != null && currentUrl == '/about' ? 'active' : ''}"
+                           href="/about">О проекте</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav ms-auto">
+                    <!-- Для неавторизованных пользователей -->
+                    <li class="nav-item" sec:authorize="!isAuthenticated()">
+                        <a class="nav-link" href="/user/login">Войти</a>
+                    </li>
+                    <li class="nav-item" sec:authorize="!isAuthenticated()">
+                        <a class="nav-link" href="/user/register">Регистрация</a>
+                    </li>
+
+                    <!-- Для авторизованных пользователей -->
+                    <li class="nav-item dropdown" sec:authorize="isAuthenticated()">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                           data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-user me-1"></i>
+                            <span sec:authentication="name">Пользователь</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                            <li><a class="dropdown-item" href="/user/profile">Мой профиль</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <!-- Форма для выхода с методом POST -->
+                                <form th:action="@{/user/logout}" method="post" class="d-inline w-100">
+                                    <button type="submit" class="dropdown-item text-danger">
+                                        <i class="fas fa-sign-out-alt me-1"></i>Выйти
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </li>
+
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Сообщения об успешных операциях или ошибках -->
+    <div class="container mt-3">
+        <div class="alert alert-success alert-dismissible fade show" role="alert" th:if="${successMessage}">
+            <i class="fas fa-check-circle me-2"></i><span th:text="${successMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert" th:if="${errorMessage}">
+            <i class="fas fa-exclamation-circle me-2"></i><span th:text="${errorMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    </div>
+</header>
+</body>
+</html>

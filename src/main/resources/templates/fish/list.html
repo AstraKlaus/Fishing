@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head th:replace="~{fragments/layout :: head('Каталог рыб')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: main-layout('Каталог рыб', ~{::content})}">
+  <div th:fragment="content">
+    <!-- Форма поиска -->
+    <div class="row mb-4">
+      <div class="col-md-6">
+        <form action="/fish/search" method="get" class="d-flex">
+          <input type="text" name="keyword" class="form-control me-2" placeholder="Поиск рыбы..."
+                 th:value="${keyword != null ? keyword : ''}">
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-search"></i>
+          </button>
+        </form>
+      </div>
+      <div class="col-md-6">
+        <div class="btn-group float-end" role="group">
+          <a href="/fish" class="btn btn-outline-primary"
+             th:classappend="${currentType == null ? 'active' : ''}">Все</a>
+          <a href="/fish/type/Речная" class="btn btn-outline-primary"
+             th:classappend="${currentType != null && currentType == 'Речная' ? 'active' : ''}">Речные</a>
+          <a href="/fish/type/Озерная" class="btn btn-outline-primary"
+             th:classappend="${currentType != null && currentType == 'Озерная' ? 'active' : ''}">Озерные</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Результаты поиска -->
+    <div class="alert alert-info" th:if="${keyword != null}">
+      Результаты поиска по запросу: <strong th:text="${keyword}"></strong>
+      <a href="/fish" class="alert-link float-end">Сбросить поиск</a>
+    </div>
+
+    <!-- Информация о фильтре по типу -->
+    <div class="alert alert-info" th:if="${currentType != null}">
+      Показаны рыбы типа: <strong th:text="${currentType}"></strong>
+      <a href="/fish" class="alert-link float-end">Показать все</a>
+    </div>
+
+    <!-- Нет результатов -->
+    <div class="alert alert-warning" th:if="${#lists.isEmpty(fishes)}">
+      <i class="fas fa-exclamation-circle me-2"></i>
+      К сожалению, ничего не найдено. Попробуйте изменить параметры поиска.
+    </div>
+
+    <!-- Список рыб -->
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+      <div class="col" th:each="fish : ${fishes}">
+        <div class="card h-100 fish-card">
+          <div class="position-relative">
+            <img th:if="${fish.base64Image != null}"
+                 th:src="@{'data:image/jpeg;base64,' + ${fish.base64Image}}"
+                 class="card-img-top" alt="Изображение рыбы">
+            <img th:unless="${fish.base64Image != null}"
+                 src="https://via.placeholder.com/300x180?text=Нет+изображения"
+                 class="card-img-top" alt="Нет изображения">
+            <span class="position-absolute top-0 end-0 badge bg-primary m-2" th:text="${fish.fishType}">Тип</span>
+          </div>
+          <div class="card-body">
+            <h5 class="card-title" th:text="${fish.name}">Название рыбы</h5>
+            <p class="card-text" th:text="${#strings.abbreviate(fish.description, 100)}">Описание</p>
+          </div>
+          <div class="card-footer bg-white">
+            <div class="d-flex justify-content-between align-items-center">
+                                <span class="text-muted">
+                                    <i class="fas fa-weight-hanging me-1"></i>
+                                    <span th:text="${fish.averageWeight + ' кг'}">Вес</span>
+                                </span>
+              <a th:href="@{/fish/{id}(id=${fish.id})}" class="btn btn-sm btn-outline-primary">Подробнее</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Кнопка добавления новой рыбы (для админа) -->
+    <div class="text-center mt-4">
+      <a href="/fish/add" class="btn btn-success">
+        <i class="fas fa-plus me-1"></i> Добавить новую рыбу
+      </a>
+    </div>
+  </div>
+</div>
+</body>
+</html>

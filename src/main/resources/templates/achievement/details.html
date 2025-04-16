@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head th:replace="~{fragments/layout :: head('Детали достижения')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: main-layout('Детали рыболовного достижения', ~{::content})}">
+  <div th:fragment="content">
+    <div class="row">
+      <div class="col-md-8 mx-auto">
+        <div class="card">
+          <div class="card-header bg-primary text-white">
+            <h5 class="card-title mb-0" th:text="${achievement.fish != null ? achievement.fish.name : 'Достижение'}">
+              Название рыбы
+            </h5>
+          </div>
+          <div class="card-body">
+            <div class="row mb-4">
+              <div class="col-md-6">
+                <!-- Фото улова -->
+                <div class="text-center mb-3">
+                  <img th:if="${achievement.base64Photo != null}"
+                       th:src="@{'data:image/jpeg;base64,' + ${achievement.base64Photo}}"
+                       class="img-fluid rounded" alt="Фото улова"
+                       style="max-height: 300px;">
+                  <img th:if="${achievement.base64Photo == null && achievement.fish != null && achievement.fish.base64Image != null}"
+                       th:src="@{'data:image/jpeg;base64,' + ${achievement.fish.base64Image}}"
+                       class="img-fluid rounded" alt="Изображение рыбы"
+                       style="max-height: 300px;">
+                  <img th:if="${achievement.base64Photo == null && (achievement.fish == null || achievement.fish.base64Image == null)}"
+                       src="https://via.placeholder.com/400x300?text=Нет+фото"
+                       class="img-fluid rounded" alt="Нет фото">
+                </div>
+              </div>
+              <div class="col-md-6">
+                <h4 class="card-title" th:text="${achievement.fish != null ? achievement.fish.name : 'Неизвестная рыба'}">
+                  Название рыбы
+                </h4>
+
+                <ul class="list-group list-group-flush">
+                  <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <strong>Дата улова:</strong>
+                    <span th:text="${#temporals.format(achievement.date, 'dd.MM.yyyy')}">01.01.2023</span>
+                  </li>
+                  <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <strong>Вес:</strong>
+                    <span th:text="${achievement.weight + ' кг'}">0.5 кг</span>
+                  </li>
+                  <li class="list-group-item d-flex justify-content-between align-items-center" th:if="${achievement.fish != null}">
+                    <strong>Тип рыбы:</strong>
+                    <span class="badge bg-primary" th:text="${achievement.fish.fishType}">Речная</span>
+                  </li>
+                </ul>
+
+                <!-- Отметка о достижении -->
+                <div class="alert alert-success mt-3" th:if="${achievement.weight != null && achievement.fish != null && achievement.fish.recordWeight != null && achievement.weight >= achievement.fish.recordWeight}">
+                  <i class="fas fa-trophy me-2"></i>
+                  <strong>Рекордный улов!</strong> Вес вашего улова превышает средний рекордный вес для данного вида рыбы.
+                </div>
+                <div class="alert alert-info mt-3" th:if="${achievement.weight != null && achievement.fish != null && achievement.fish.averageWeight != null && achievement.weight >= achievement.fish.averageWeight &&
+                                                                               (achievement.fish.recordWeight == null || achievement.weight < achievement.fish.recordWeight)}">
+                  <i class="fas fa-award me-2"></i>
+                  <strong>Отличный улов!</strong> Вес вашего улова выше среднего для данного вида рыбы.
+                </div>
+              </div>
+            </div>
+
+            <!-- Комментарий -->
+            <div class="card mb-3" th:if="${achievement.comment}">
+              <div class="card-header">
+                <h6 class="mb-0">Комментарий</h6>
+              </div>
+              <div class="card-body">
+                <p class="card-text" th:text="${achievement.comment}">Комментарий</p>
+              </div>
+            </div>
+
+            <!-- Информация о рыбе -->
+            <div class="card" th:if="${achievement.fish != null}">
+              <div class="card-header">
+                <h6 class="mb-0">Информация о рыбе</h6>
+              </div>
+              <div class="card-body">
+                <p class="card-text" th:if="${achievement.fish.description}" th:text="${#strings.abbreviate(achievement.fish.description, 200)}">
+                  Описание рыбы
+                </p>
+                <a th:href="@{/fish/{id}(id=${achievement.fish.id})}" class="btn btn-sm btn-outline-primary">
+                  Подробнее о рыбе
+                </a>
+              </div>
+            </div>
+          </div>
+          <div class="card-footer bg-white">
+            <div class="d-flex justify-content-between">
+              <a href="/achievements" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-1"></i> Назад к списку
+              </a>
+              <div>
+                <a th:href="@{/achievements/edit/{id}(id=${achievement.id})}" class="btn btn-warning me-2">
+                  <i class="fas fa-edit me-1"></i> Редактировать
+                </a>
+                <form th:action="@{/achievements/delete/{id}(id=${achievement.id})}" method="post"
+                      onsubmit="return confirm('Вы уверены, что хотите удалить это достижение?');" class="d-inline">
+                  <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-trash-alt me-1"></i> Удалить
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

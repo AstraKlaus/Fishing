@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head th:replace="~{fragments/layout :: head('Мой профиль')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: main-layout('Мой профиль', ~{::content})}">
+    <div th:fragment="content">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="card-title mb-0">Информация о пользователе</h5>
+                    </div>
+                    <div class="card-body text-center">
+                        <i class="fas fa-user-circle fa-5x text-muted mb-3"></i>
+                        <h4 th:text="${user.username}">Имя пользователя</h4>
+                        <p class="text-muted" th:text="${user.email}">email@example.com</p>
+                        <p class="text-muted">
+                            <small>
+                                Дата регистрации:
+                                <span th:text="${#temporals.format(user.registrationDate, 'dd.MM.yyyy')}">01.01.2023</span>
+                            </small>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="card-title mb-0">Статистика</h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Всего уловов
+                                <span class="badge bg-primary rounded-pill" th:text="${achievements != null ? achievements.size() : 0}">0</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Видов рыб поймано
+                                <!-- Используем #sets для работы с уникальными значениями -->
+                                <span class="badge bg-primary rounded-pill"
+                                      th:with="fishIds=${achievements != null ? #sets.toSet(achievements.?[fish != null].![fish.id]) : {}}"
+                                      th:text="${#sets.size(fishIds)}">0</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Рекордные уловы
+                                <!-- Используем более простое выражение с безопасными проверками -->
+                                <span class="badge bg-warning rounded-pill"
+                                      th:with="recordCount=${achievements != null ? #lists.size(achievements.?[weight != null and fish != null and fish.recordWeight != null and weight >= fish.recordWeight]) : 0}"
+                                      th:text="${recordCount}">0</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="card-footer text-center">
+                        <a href="/achievements/add" class="btn btn-success">
+                            <i class="fas fa-plus-circle me-1"></i> Добавить достижение
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-8">
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">Мои последние достижения</h5>
+                        <a href="/achievements" class="btn btn-sm btn-light">Смотреть все</a>
+                    </div>
+                    <div class="card-body">
+                        <!-- Нет достижений -->
+                        <div class="alert alert-info" th:if="${#lists.isEmpty(achievements)}">
+                            <i class="fas fa-info-circle me-2"></i>
+                            У вас пока нет достижений. Поймайте рыбу и добавьте свой первый улов!
+                        </div>
+
+                        <!-- Список последних достижений (макс. 3) -->
+                        <div class="row" th:unless="${#lists.isEmpty(achievements)}">
+                            <div class="col-md-12" th:each="achievement, iterStat : ${achievements}" th:if="${iterStat.index < 3}">
+                                <div class="card mb-3 achievement-card">
+                                    <div class="row g-0">
+                                        <div class="col-md-3">
+                                            <!-- Изображение улова -->
+                                            <img th:if="${achievement.base64Photo != null}"
+                                                 th:src="@{'data:image/jpeg;base64,' + ${achievement.base64Photo}}"
+                                                 class="img-fluid rounded-start h-100" alt="Фото улова"
+                                                 style="object-fit: cover; max-height: 150px; width: 100%;">
+                                            <!-- Изображение рыбы (если нет фото улова) -->
+                                            <img th:if="${achievement.base64Photo == null && achievement.fish != null && achievement.fish.base64Image != null}"
+                                                 th:src="@{'data:image/jpeg;base64,' + ${achievement.fish.base64Image}}"
+                                                 class="img-fluid rounded-start h-100" alt="Изображение рыбы"
+                                                 style="object-fit: cover; max-height: 150px; width: 100%;">
+                                            <!-- Заглушка, если нет ни того, ни другого -->
+                                            <img th:if="${achievement.base64Photo == null && (achievement.fish == null || achievement.fish.base64Image == null)}"
+                                                 src="https://via.placeholder.com/300x150?text=Нет+фото"
+                                                 class="img-fluid rounded-start h-100" alt="Нет фото"
+                                                 style="object-fit: cover; max-height: 150px; width: 100%;">
+                                        </div>
+                                        <div class="col-md-9">
+                                            <div class="card-body">
+                                                <div class="d-flex justify-content-between align-items-start">
+                                                    <h5 class="card-title" th:text="${achievement.fish != null ? achievement.fish.name : 'Неизвестная рыба'}">
+                                                        Название рыбы
+                                                    </h5>
+                                                    <span class="badge bg-primary" th:if="${achievement.fish != null}" th:text="${achievement.fish.fishType}">
+                                                            Тип рыбы
+                                                        </span>
+                                                </div>
+
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <p class="card-text mb-1">
+                                                            <i class="fas fa-weight-hanging me-1"></i>
+                                                            <span th:text="${achievement.weight + ' кг'}">0.5 кг</span>
+                                                        </p>
+                                                        <p class="card-text">
+                                                            <i class="fas fa-calendar-alt me-1"></i>
+                                                            <span th:text="${#temporals.format(achievement.date, 'dd.MM.yyyy')}">01.01.2023</span>
+                                                        </p>
+                                                    </div>
+                                                    <div class="col-md-6" th:if="${achievement.fish != null}">
+                                                        <p class="card-text mb-1">
+                                                            <i class="fas fa-trophy me-1 text-warning"></i>
+                                                            <span th:if="${achievement.weight != null && achievement.fish.recordWeight != null && achievement.weight >= achievement.fish.recordWeight}"
+                                                                  class="text-success fw-bold">Рекордный улов!</span>
+                                                            <span th:if="${achievement.weight != null && achievement.fish.averageWeight != null && achievement.weight >= achievement.fish.averageWeight &&
+                                                                               (achievement.fish.recordWeight == null || achievement.weight < achievement.fish.recordWeight)}"
+                                                                  class="text-primary">Выше среднего!</span>
+                                                        </p>
+                                                    </div>
+                                                </div>
+
+                                                <div class="text-end mt-2">
+                                                    <a th:href="@{/achievements/{id}(id=${achievement.id})}" class="btn btn-sm btn-outline-primary">
+                                                        <i class="fas fa-eye me-1"></i> Подробнее
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="card-title mb-0">Рекомендации по рыбалке</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Ознакомьтесь с нашим каталогом рыб, чтобы получить полезную информацию для вашей следующей рыбалки.
+                        </div>
+
+                        <h6 class="mt-3">Популярные виды рыб:</h6>
+                        <div class="row row-cols-1 row-cols-md-3 g-3 mt-2">
+                            <div class="col">
+                                <a href="/fish/1" class="text-decoration-none">
+                                    <div class="card h-100">
+                                        <div class="card-body text-center">
+                                            <i class="fas fa-fish fa-2x text-primary mb-2"></i>
+                                            <h6 class="card-title">Щука</h6>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="col">
+                                <a href="/fish/2" class="text-decoration-none">
+                                    <div class="card h-100">
+                                        <div class="card-body text-center">
+                                            <i class="fas fa-fish fa-2x text-primary mb-2"></i>
+                                            <h6 class="card-title">Карп</h6>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="col">
+                                <a href="/fish/3" class="text-decoration-none">
+                                    <div class="card h-100">
+                                        <div class="card-body text-center">
+                                            <i class="fas fa-fish fa-2x text-primary mb-2"></i>
+                                            <h6 class="card-title">Окунь</h6>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="text-center mt-4">
+                            <a href="/fish" class="btn btn-outline-primary">
+                                <i class="fas fa-book me-1"></i> Перейти к каталогу рыб
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

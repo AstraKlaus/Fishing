@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head th:replace="~{fragments/layout :: head('Регистрация')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: main-layout('Регистрация нового пользователя', ~{::content})}">
+    <div th:fragment="content">
+        <div class="row">
+            <div class="col-md-6 mx-auto">
+                <div class="card">
+                    <div class="card-body">
+                        <form th:action="@{/user/register}" method="post" th:object="${user}">
+                            <div class="mb-3">
+                                <label for="username" class="form-label">Имя пользователя<span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="username" th:field="*{username}" required
+                                       minlength="3" maxlength="50">
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('username')}" th:errors="*{username}">
+                                    Ошибка в имени пользователя
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email<span class="text-danger">*</span></label>
+                                <input type="email" class="form-control" id="email" th:field="*{email}" required>
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('email')}" th:errors="*{email}">
+                                    Ошибка в email
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="password" class="form-label">Пароль<span class="text-danger">*</span></label>
+                                <input type="password" class="form-control" id="password" th:field="*{password}" required
+                                       minlength="6">
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('password')}" th:errors="*{password}">
+                                    Ошибка в пароле
+                                </div>
+                                <div class="form-text">Пароль должен содержать минимум 6 символов</div>
+                            </div>
+
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-user-plus me-1"></i> Зарегистрироваться
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="card-footer text-center">
+                        <p class="mb-0">Уже зарегистрированы? <a href="/user/login">Войти</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

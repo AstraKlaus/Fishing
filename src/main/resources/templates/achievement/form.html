@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head th:replace="~{fragments/layout :: head(${achievement.id != null ? 'Редактирование достижения' : 'Добавление достижения'})}"></head>
+<body>
+<div th:replace="~{fragments/layout :: main-layout(${achievement.id != null ? 'Редактирование достижения' : 'Добавление нового достижения'}, ~{::content})}">
+    <div th:fragment="content">
+        <div class="row">
+            <div class="col-md-8 mx-auto">
+                <div class="card">
+                    <div class="card-body">
+                        <form th:action="${achievement.id != null ? '/achievements/edit/' + achievement.id : '/achievements/add'}"
+                              method="post" enctype="multipart/form-data" th:object="${achievement}">
+
+                            <!-- Выбор рыбы -->
+                            <div class="mb-3" th:if="${achievement.id == null}">
+                                <label for="fishId" class="form-label">Вид рыбы<span class="text-danger">*</span></label>
+                                <select class="form-select" id="fishId" name="fishId" required>
+                                    <option value="">Выберите вид рыбы</option>
+                                    <option th:each="fish : ${fishes}"
+                                            th:value="${fish.id}"
+                                            th:text="${fish.name}"
+                                            th:selected="${param.fishId != null && param.fishId[0] == fish.id.toString()}">
+                                        Название рыбы
+                                    </option>
+                                </select>
+                            </div>
+
+                            <!-- При редактировании показываем информацию о рыбе -->
+                            <div class="mb-3" th:if="${achievement.id != null && achievement.fish != null}">
+                                <label class="form-label">Вид рыбы</label>
+                                <div class="input-group">
+                                        <span class="input-group-text">
+                                            <img th:if="${achievement.fish.base64Image != null}"
+                                                 th:src="@{'data:image/jpeg;base64,' + ${achievement.fish.base64Image}}"
+                                                 style="height: 30px; width: 30px; object-fit: cover;" alt="Рыба">
+                                        </span>
+                                    <input type="text" class="form-control" disabled th:value="${achievement.fish.name}">
+                                    <input type="hidden" name="fishId" th:value="${achievement.fish.id}">
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="weight" class="form-label">Вес (кг)<span class="text-danger">*</span></label>
+                                    <input type="number" step="0.01" min="0" class="form-control" id="weight" th:field="*{weight}" required>
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('weight')}" th:errors="*{weight}">
+                                        Ошибка в весе
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="date" class="form-label">Дата улова<span class="text-danger">*</span></label>
+                                    <input type="date" class="form-control" id="date" th:field="*{date}"
+                                           th:max="${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}" required>
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('date')}" th:errors="*{date}">
+                                        Ошибка в дате
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="comment" class="form-label">Комментарий</label>
+                                <textarea class="form-control" id="comment" th:field="*{comment}" rows="3"></textarea>
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('comment')}" th:errors="*{comment}">
+                                    Ошибка в комментарии
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="photoFile" class="form-label">Фотография улова</label>
+
+                                <!-- Предпросмотр текущей фотографии при редактировании -->
+                                <div th:if="${achievement.base64Photo != null}" class="mb-2">
+                                    <p>Текущая фотография:</p>
+                                    <img th:src="@{'data:image/jpeg;base64,' + ${achievement.base64Photo}}"
+                                         style="max-width: 200px; max-height: 200px;"
+                                         class="img-thumbnail" alt="Текущая фотография">
+                                </div>
+
+                                <input type="file" class="form-control" id="photoFile" name="photoFile" accept="image/*">
+                                <div class="form-text">Фотография вашего улова (JPEG, PNG до 5 МБ).
+                                    <span th:if="${achievement.id != null}">Оставьте пустым, чтобы сохранить текущую фотографию.</span>
+                                </div>
+                            </div>
+
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                <a th:href="${achievement.id != null ? '/achievements/' + achievement.id : '/achievements'}" class="btn btn-secondary me-md-2">
+                                    Отмена
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-1"></i>
+                                    <span th:text="${achievement.id != null ? 'Сохранить изменения' : 'Добавить достижение'}"></span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

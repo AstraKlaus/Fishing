@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head th:replace="~{fragments/layout :: head(${fish.id != null ? 'Редактирование рыбы' : 'Добавление рыбы'})}"></head>
+<body>
+<div th:replace="~{fragments/layout :: main-layout(${fish.id != null ? 'Редактирование рыбы' : 'Добавление новой рыбы'}, ~{::content})}">
+  <div th:fragment="content">
+    <div class="row">
+      <div class="col-md-8 mx-auto">
+        <div class="card">
+          <div class="card-body">
+            <form th:action="${fish.id != null ? '/fish/edit/' + fish.id : '/fish/add'}"
+                  method="post" enctype="multipart/form-data" th:object="${fish}">
+
+              <div class="mb-3">
+                <label for="name" class="form-label">Название рыбы<span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="name" th:field="*{name}" required>
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">
+                  Ошибка в названии рыбы
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="fishType" class="form-label">Тип рыбы<span class="text-danger">*</span></label>
+                <select class="form-select" id="fishType" th:field="*{fishType}" required>
+                  <option value="">Выберите тип</option>
+                  <option value="Речная">Речная</option>
+                  <option value="Озерная">Озерная</option>
+                  <option value="Морская">Морская</option>
+                </select>
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('fishType')}" th:errors="*{fishType}">
+                  Ошибка в типе рыбы
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <label for="averageWeight" class="form-label">Средний вес (кг)</label>
+                  <input type="number" step="0.01" min="0" class="form-control" id="averageWeight" th:field="*{averageWeight}">
+                  <div class="invalid-feedback" th:if="${#fields.hasErrors('averageWeight')}" th:errors="*{averageWeight}">
+                    Ошибка в среднем весе
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <label for="recordWeight" class="form-label">Рекордный вес (кг)</label>
+                  <input type="number" step="0.01" min="0" class="form-control" id="recordWeight" th:field="*{recordWeight}">
+                  <div class="invalid-feedback" th:if="${#fields.hasErrors('recordWeight')}" th:errors="*{recordWeight}">
+                    Ошибка в рекордном весе
+                  </div>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="description" class="form-label">Описание</label>
+                <textarea class="form-control" id="description" th:field="*{description}" rows="5"></textarea>
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('description')}" th:errors="*{description}">
+                  Ошибка в описании
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="imageFile" class="form-label">Изображение</label>
+
+                <!-- Предпросмотр текущего изображения при редактировании -->
+                <div th:if="${fish.base64Image != null}" class="mb-2">
+                  <p>Текущее изображение:</p>
+                  <img th:src="@{'data:image/jpeg;base64,' + ${fish.base64Image}}"
+                       style="max-width: 200px; max-height: 200px;"
+                       class="img-thumbnail" alt="Текущее изображение">
+                </div>
+
+                <input type="file" class="form-control" id="imageFile" name="imageFile" accept="image/*">
+                <div class="form-text">Изображение рыбы (JPEG, PNG до 5 МБ).
+                  <span th:if="${fish.id != null}">Оставьте пустым, чтобы сохранить текущее изображение.</span>
+                </div>
+              </div>
+
+              <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <a th:href="${fish.id != null ? '/fish/' + fish.id : '/fish'}" class="btn btn-secondary me-md-2">
+                  Отмена
+                </a>
+                <button type="submit" class="btn btn-primary">
+                  <i class="fas fa-save me-1"></i>
+                  <span th:text="${fish.id != null ? 'Сохранить изменения' : 'Добавить рыбу'}"></span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

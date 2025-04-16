@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head th:replace="~{fragments/layout :: head('О проекте')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: main-layout('О проекте', ~{::content})}">
+  <div th:fragment="content">
+    <div class="row">
+      <div class="col-lg-8">
+        <div class="card mb-4">
+          <div class="card-body">
+            <h2>Помощник рыболова-любителя</h2>
+            <p class="lead">Ваш надежный помощник в мире рыбной ловли</p>
+            <hr>
+            <p>
+              Наш веб-сервис создан для всех любителей рыбалки, от новичков до опытных рыболовов.
+              Мы стремимся предоставить удобный и информативный инструмент, который поможет вам
+              узнать больше о различных видах рыб, их повадках и особенностях ловли.
+            </p>
+            <p>
+              С помощью нашего сервиса вы можете:
+            </p>
+            <ul>
+              <li>Изучать информацию о различных видах рыб</li>
+              <li>Вести личный дневник рыбалки</li>
+              <li>Записывать свои рыболовные достижения</li>
+              <li>Загружать фотографии своих уловов</li>
+            </ul>
+            <p>
+              Мы постоянно работаем над улучшением нашего сервиса и добавлением новых функций,
+              чтобы сделать ваш опыт рыбалки ещё более приятным и успешным.
+            </p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-body">
+            <h3>Правила пользования сервисом</h3>
+            <ol>
+              <li>Бережно относитесь к природе и соблюдайте правила рыболовства.</li>
+              <li>Уважайте других пользователей сервиса.</li>
+              <li>Публикуйте только собственные фотографии уловов.</li>
+              <li>Вносите правдивую информацию о своих уловах.</li>
+              <li>Помните о сезонных запретах на ловлю определенных видов рыб в период нереста.</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4">
+        <div class="card border-primary mb-4">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="fas fa-book me-2"></i>Курсовая работа</h5>
+          </div>
+          <div class="card-body">
+            <p>
+              Данный веб-сервис разработан в рамках курсовой работы по теме
+              "Веб-сервис 'Помощник рыболова-любителя'".
+            </p>
+            <p>
+              Технологии:
+            </p>
+            <ul>
+              <li>Spring Boot</li>
+              <li>Spring MVC</li>
+              <li>Spring Data JPA</li>
+              <li>Thymeleaf</li>
+              <li>Bootstrap</li>
+              <li>PostgreSQL</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Контакты</h5>
+            <p>Если у вас есть вопросы, предложения или вы нашли ошибку, пожалуйста, свяжитесь с нами:</p>
+            <div class="d-flex align-items-center mb-2">
+              <i class="fas fa-envelope text-primary me-2"></i>
+              <span>support@fishing-assistant.ru</span>
+            </div>
+            <div class="d-flex align-items-center">
+              <i class="fas fa-phone text-primary me-2"></i>
+              <span>+7 (123) 456-78-90</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

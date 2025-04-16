@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Главная')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: main-layout('Добро пожаловать в мир рыбалки!', ~{::content})}">
+  <div th:fragment="content">
+    <div class="row">
+      <div class="col-md-8">
+        <div class="bg-light p-4 rounded mb-4">
+          <h2>Помощник рыболова-любителя</h2>
+          <p class="lead">Ваш верный спутник в мире рыбалки!</p>
+          <p>Наш сервис поможет вам узнать всё о различных видах рыб, их повадках и особенностях ловли, а также сохранить свои рыболовные достижения.</p>
+          <div class="mt-4">
+            <a href="/fish" class="btn btn-primary">Перейти к каталогу рыб</a>
+            <a href="/about" class="btn btn-outline-secondary ms-2">Узнать больше</a>
+          </div>
+        </div>
+
+        <div class="row mt-4">
+          <div class="col-md-6">
+            <div class="card h-100">
+              <div class="card-body">
+                <h5 class="card-title"><i class="fas fa-fish me-2"></i>Каталог рыб</h5>
+                <p class="card-text">Изучите подробную информацию о различных видах рыб, их средних размерах и особенностях ловли.</p>
+                <a href="/fish" class="btn btn-sm btn-outline-primary">Перейти в каталог</a>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card h-100">
+              <div class="card-body">
+                <h5 class="card-title"><i class="fas fa-trophy me-2"></i>Личные достижения</h5>
+                <p class="card-text">Ведите дневник своих уловов, сохраняйте фотографии и делитесь своими рыболовными успехами.</p>
+                <!-- Для неавторизованных пользователей -->
+                <a sec:authorize="!isAuthenticated()" href="/user/login" class="btn btn-sm btn-outline-primary">Начать вести дневник</a>
+
+                <!-- Для авторизованных пользователей -->
+                <a sec:authorize="isAuthenticated()" href="/achievements" class="btn btn-sm btn-outline-primary">Перейти к дневнику</a>
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card border-primary">
+          <div class="card-header bg-primary text-white">
+            <h5 class="card-title mb-0"><i class="fas fa-info-circle me-2"></i>Полезная информация</h5>
+          </div>
+          <div class="card-body">
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item d-flex">
+                <i class="fas fa-check-circle text-success me-2 mt-1"></i>
+                <div>
+                  <strong>Подробные описания рыб</strong>
+                  <p class="mb-0 text-muted small">Информация о размерах, весе и повадках</p>
+                </div>
+              </li>
+              <li class="list-group-item d-flex">
+                <i class="fas fa-check-circle text-success me-2 mt-1"></i>
+                <div>
+                  <strong>Личный дневник рыболова</strong>
+                  <p class="mb-0 text-muted small">Записывайте свои достижения и улучшайте результаты</p>
+                </div>
+              </li>
+              <li class="list-group-item d-flex">
+                <i class="fas fa-check-circle text-success me-2 mt-1"></i>
+                <div>
+                  <strong>Фотографии уловов</strong>
+                  <p class="mb-0 text-muted small">Сохраняйте фотографии своих трофеев</p>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="card mt-4">
+          <div class="card-body">
+            <h5 class="card-title">Уже зарегистрированы?</h5>
+            <p class="card-text">Войдите в свой аккаунт, чтобы получить доступ к личному кабинету и начать вести дневник своих рыболовных достижений.</p>
+            <div class="d-grid gap-2">
+              <a href="/user/login" class="btn btn-primary">Войти</a>
+              <a href="/user/register" class="btn btn-outline-secondary">Зарегистрироваться</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
