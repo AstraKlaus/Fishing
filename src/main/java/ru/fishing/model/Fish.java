@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 @Entity
@@ -20,6 +21,10 @@ public class Fish {
     @Column(columnDefinition = "TEXT")
     private String description;
 
+    @Lob
+    @Column(name = "image")
+    private byte[] image;
+
     @DecimalMin(value = "0.0", message = "Средний вес должен быть положительным числом")
     @Column(name = "average_weight")
     private BigDecimal averageWeight;
@@ -28,41 +33,33 @@ public class Fish {
     @Column(name = "record_weight")
     private BigDecimal recordWeight;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "fish_type_id")
-    private FishType fishType;
+    @Column(name = "fish_type")
+    private String fishType;
 
     @OneToMany(mappedBy = "fish", cascade = CascadeType.ALL)
     private List<Achievement> achievements = new ArrayList<>();
 
-    @OneToMany(mappedBy = "fish", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Image> images = new ArrayList<>();
-
-    @ManyToMany
-    @JoinTable(
-        name = "fish_location",
-        joinColumns = @JoinColumn(name = "fish_id"),
-        inverseJoinColumns = @JoinColumn(name = "location_id")
-    )
-    private List<Location> locations = new ArrayList<>();
+    @Transient
+    private String base64Image;
 
     // Конструкторы
     public Fish() {
     }
 
-    public Fish(String name, String description, BigDecimal averageWeight,
-                BigDecimal recordWeight, FishType fishType) {
+    public Fish(String name, String description, byte[] image, BigDecimal averageWeight,
+                BigDecimal recordWeight, String fishType) {
         this.name = name;
         this.description = description;
+        this.image = image;
         this.averageWeight = averageWeight;
         this.recordWeight = recordWeight;
         this.fishType = fishType;
     }
 
-    // Получение основного изображения рыбы (если есть)
-    public Image getMainImage() {
-        if (images != null && !images.isEmpty()) {
-            return images.get(0);
+    // Метод для получения изображения в формате Base64
+    public String getBase64Image() {
+        if (image != null) {
+            return Base64.getEncoder().encodeToString(image);
         }
         return null;
     }
@@ -92,6 +89,14 @@ public class Fish {
         this.description = description;
     }
 
+    public byte[] getImage() {
+        return image;
+    }
+
+    public void setImage(byte[] image) {
+        this.image = image;
+    }
+
     public BigDecimal getAverageWeight() {
         return averageWeight;
     }
@@ -108,11 +113,11 @@ public class Fish {
         this.recordWeight = recordWeight;
     }
 
-    public FishType getFishType() {
+    public String getFishType() {
         return fishType;
     }
 
-    public void setFishType(FishType fishType) {
+    public void setFishType(String fishType) {
         this.fishType = fishType;
     }
 
@@ -124,29 +129,7 @@ public class Fish {
         this.achievements = achievements;
     }
 
-    public List<Image> getImages() {
-        return images;
-    }
-
-    public void setImages(List<Image> images) {
-        this.images = images;
-    }
-
-    public List<Location> getLocations() {
-        return locations;
-    }
-
-    public void setLocations(List<Location> locations) {
-        this.locations = locations;
-    }
-
-    public void addImage(Image image) {
-        images.add(image);
-        image.setFish(this);
-    }
-
-    public void removeImage(Image image) {
-        images.remove(image);
-        image.setFish(null);
+    public void setBase64Image(String base64Image) {
+        this.base64Image = base64Image;
     }
 }
