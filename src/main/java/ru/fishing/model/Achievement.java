@@ -4,7 +4,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Base64;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "achievements")
@@ -29,34 +30,28 @@ public class Achievement {
     @Column(nullable = false)
     private LocalDate date;
 
-    @Lob
-    @Column(name = "photo")
-    private byte[] photo;
-
     private String comment;
 
-    @Transient
-    private String base64Photo;
+    @OneToMany(mappedBy = "achievement", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Image> images = new ArrayList<>();
 
     // Конструкторы
     public Achievement() {
         this.date = LocalDate.now();
     }
 
-    public Achievement(User user, Fish fish, BigDecimal weight, LocalDate date,
-                       byte[] photo, String comment) {
+    public Achievement(User user, Fish fish, BigDecimal weight, LocalDate date, String comment) {
         this.user = user;
         this.fish = fish;
         this.weight = weight;
         this.date = date;
-        this.photo = photo;
         this.comment = comment;
     }
 
-    // Метод для получения фото в формате Base64
-    public String getBase64Photo() {
-        if (photo != null) {
-            return Base64.getEncoder().encodeToString(photo);
+    // Получение основного изображения достижения (если есть)
+    public Image getMainImage() {
+        if (images != null && !images.isEmpty()) {
+            return images.get(0);
         }
         return null;
     }
@@ -102,14 +97,6 @@ public class Achievement {
         this.date = date;
     }
 
-    public byte[] getPhoto() {
-        return photo;
-    }
-
-    public void setPhoto(byte[] photo) {
-        this.photo = photo;
-    }
-
     public String getComment() {
         return comment;
     }
@@ -118,8 +105,22 @@ public class Achievement {
         this.comment = comment;
     }
 
-    public void setBase64Photo(String base64Photo) {
-        this.base64Photo = base64Photo;
+    public List<Image> getImages() {
+        return images;
+    }
+
+    public void setImages(List<Image> images) {
+        this.images = images;
+    }
+
+    public void addImage(Image image) {
+        images.add(image);
+        image.setAchievement(this);
+    }
+
+    public void removeImage(Image image) {
+        images.remove(image);
+        image.setAchievement(null);
     }
 }
 
